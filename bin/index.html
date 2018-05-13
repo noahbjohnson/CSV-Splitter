@@ -1,15 +1,177 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title></title>
+
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-  </head>
-  <body>
+    <meta name="description" content="">
+    <meta name="author" content="Noah B Johnson">
+    <link rel="icon" href="assets/favicon.ico">
 
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
-  </body>
+    <title>CSV Splitter Application</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Custom styles -->
+    <style type="text/css">
+        body {
+            padding-top: 5rem;
+        }
+
+        .title-block {
+            padding: 3rem 1.5rem;
+            text-align: center;
+            background-color: azure;
+        }
+
+        .content-block {
+            padding: 3rem 1.5rem;
+            text-align: center;
+            background-color: floralwhite;
+            vertical-align: middle;
+            align-content: center;
+        }
+
+        .bd-example-modal-lg .modal-dialog {
+            /*display: table;*/
+            position: relative;
+            margin: 0 auto;
+            top: calc(50% - 24px);
+        }
+
+        .bd-example-modal-lg .modal-dialog .modal-content {
+            background-color: transparent;
+            border: none;
+            color: azure;
+            align-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+    <!--
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        <aclass="navbar-brand" href="#">Navbar</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#">Disabled</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</a>
+                    <div class="dropdown-menu" aria-labelledby="dropdown01">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
+-->
+    <div class="modal fade bd-example-modal-lg" data-backdrop="static" data-keyboard="false" tabindex="-1" id="loading">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <span class="fa fa-spinner fa-spin fa-3x"></span>
+                </div>
+                <div class="modal-footer">
+                <em id="rowsLoaded"></em>   &nbsp;Rows Loaded
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <div role="banner" class="container">
+
+        <div class="title-block">
+            <h1>CSV Splitter</h1>
+            <p class="lead">A simple web app for splitting your CSV files. Currently providing support for basic splitting by desired size, as well as random sampling.</p>
+        </div>
+
+    </div>
+    <br>
+    <div role="main" class="container">
+
+        <div class="content-block" id="stepOne">
+            <b>Step One:</b> Choose a File<br> <input style="padding-top: .5rem" class="inline-step" type="file" id="sourceFile" onchange="fileSelected()" />
+            <div>
+                <label for="headerOption" style="padding-top: .5rem">Parse Header?</label>
+                <select id="header" name="headerOption">
+                <option>Yes</option>
+                <option>No</option>
+            </select><br>
+            </div>
+            <button id="uploadButton" onclick="upload()" disabled>Upload</button>
+
+        </div>
+        <br>
+        <div class="content-block" id="stepTwo" hidden>
+            <em id="linesLoaded"></em><em> Rows Loaded</em><br><br>
+            <b>Step Two:</b> Choose a Split<br>
+            <select id="splitOption" onchange="showStepThree()">
+                <option disabled selected value> -- select an option -- </option>
+                <optgroup label="Non-Random">
+                    <option>Max Rows</option>
+                    <option disabled>Column Value</option>
+                    <option>Number of Files</option>
+                </optgroup>
+                <optgroup label="Random">
+                    <option>Ratio</option>
+                </optgroup>
+            </select>
+        </div><br>
+        <div class="content-block" id="stepThree" hidden>
+            <b>Step Three:</b> Split Options<br>
+            <div id="maxRows" hidden>
+                <input type="number" />
+            </div>
+            <div id="columnValue" hidden>
+                <input type="number" />
+            </div>
+            <div id="numberOfFiles" hidden>
+                <input type="number" />
+            </div>
+            <div id="ratioRandom" hidden>
+                <input type="number" />
+            </div>
+        </div>
+        <!-- /.container -->
+
+
+        <!-- Bootstrap core JavaScript
+    ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+
+        <!-- app js    -->
+        <script src="source/PapaParse-4.4.0/papaparse.min.js"></script>
+        <script src="source/csv.js"></script>
+
+
+</body>
+
 </html>
